@@ -196,6 +196,8 @@ static void mount_filesystem(char *dev, char *dir, char *type,
     if (toys.optflags & FLAG_v)
       printf("try '%s' type '%s' on '%s'\n", dev, type, dir);
     for (;;) {
+      if (flags & MS_REMOUNT)
+        opts = NULL;
       rc = mount(dev, dir, type, flags, opts);
       // Did we succeed, fail unrecoverably, or already try read-only?
       if (!rc || (errno != EACCES && errno != EROFS) || (flags&MS_RDONLY))
@@ -297,7 +299,7 @@ void mount_main(void)
   // For remount we need _last_ match (in case of overmounts), so traverse
   // in reverse order. (Yes I'm using remount as a boolean for a bit here,
   // the double cast is to get gcc to shut up about it.)
-  remount = (void *)(long)comma_scan(opts, "remount", 1);
+  remount = (void *)(long)comma_scan(opts, "remount", 0);
   if (((toys.optflags & FLAG_a) && !access("/proc/mounts", R_OK)) || remount) {
     mm = dlist_terminate(mtl = mtl2 = xgetmountlist(0));
     if (remount) remount = mm;
