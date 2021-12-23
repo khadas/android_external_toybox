@@ -300,7 +300,8 @@ void i2cset_main(void)
       data.block[i+1] = atolx_range(toys.optargs[3+i], 0, 0xff);
     data.block[0] = toys.optc - 4;
   } else {
-    help_exit("syntax error");
+    ioctl_data.size = I2C_SMBUS_BYTE_DATA;
+    data.byte = atolx_range(toys.optargs[3], 0, 0xff);
   }
 
   confirm("Write register 0x%02x from chip 0x%02x on bus %d?", addr, chip, bus);
